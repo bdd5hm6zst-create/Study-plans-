@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f3ff">
+<title>Final Study Planner</title>
+<style>
+:root{--bg:#f7f6fb;--card:#fff;--ink:#26243a;--muted:#77748b;--purple:#7661d8;--pale:#eeeaff;--line:#e8e5f1;--green:#278565}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:720px;margin:auto;padding:18px 15px 42px}
+.hero{background:linear-gradient(135deg,#e9e4ff,#f7e9f4);padding:23px 20px;border-radius:25px;margin-bottom:15px}
+.eyebrow{font-size:12px;color:#6558a8;font-weight:700;letter-spacing:.08em}.hero h1{font-size:26px;margin:8px 0}.hero p{margin:0;color:#5e5874;font-size:14px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0}.stat,.panel,.day{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.progress{height:8px;background:#e8e4f4;border-radius:20px;overflow:hidden;margin-top:10px}.progress div{height:100%;width:0;background:var(--purple);transition:width .2s}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.toolbar button,.nav button{border:0;border-radius:12px;background:var(--pale);color:#51429f;padding:10px 13px;font-weight:650;font-size:13px}
+select,input,textarea{font:inherit;border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff;color:var(--ink);width:100%}
+.sectiontitle{font-size:18px;margin:22px 2px 10px}.examlist{display:grid;gap:8px}.exam{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.dot{width:10px;height:10px;border-radius:50%;background:var(--purple);flex:none}.exam strong{font-size:14px}.exam small{display:block;color:var(--muted);margin-top:3px}
+.dayhead{display:flex;align-items:center;justify-content:space-between;gap:10px}.dayhead h2{font-size:18px;margin:0}.dayhead small{color:var(--muted)}.nav{display:flex;gap:7px}.nav button{padding:8px 10px}
+.task{display:flex;align-items:flex-start;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}.task:last-child{border-bottom:0}.task input[type=checkbox]{width:21px;height:21px;accent-color:var(--purple);margin:1px 0 0;flex:none}.task .time{font-size:12px;font-weight:700;color:var(--purple);min-width:88px;padding-top:3px}.task .desc{font-size:14px;line-height:1.5}.task.done .desc{text-decoration:line-through;color:#9995a8}
+.notes{margin-top:14px}.notes label{font-size:13px;font-weight:700;display:block;margin-bottom:7px}.notes textarea{min-height:90px;resize:vertical}.muted{font-size:12px;color:var(--muted);line-height:1.5}.empty{padding:24px 12px;text-align:center;color:var(--muted)}
+@media(min-width:600px){.stats{gap:12px}.stat{padding:17px}.hero{padding:28px}}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">YOUR PERSONAL STUDY SPACE</div>
+    <h1>Final Study Planner ✨</h1>
+    <p>แพลนอ่านสอบ · ติ๊กงานที่ทำเสร็จ · จดโน้ตของแต่ละวัน<br>ข้อมูลจะบันทึกไว้ในเบราว์เซอร์ของอุปกรณ์นี้</p>
+  </section>
+  <section class="stats">
+    <div class="stat"><b id="doneCount">0</b><span>งานที่ทำแล้ว</span></div>
+    <div class="stat"><b id="totalCount">0</b><span>งานทั้งหมด</span></div>
+    <div class="stat"><b id="percent">0%</b><span>ความคืบหน้า</span></div>
+  </section>
+  <div class="progress"><div id="progressFill"></div></div>
+  <div class="toolbar">
+    <button id="todayBtn">ไปวันนี้</button>
+    <button id="resetBtn">รีเซ็ตเครื่องหมาย ✓</button>
+    <button id="exportBtn">ส่งออกโน้ต</button>
+  </div>
+  <h2 class="sectiontitle">วันสอบที่บันทึกไว้</h2>
+  <div class="examlist" id="exams"></div>
+  <h2 class="sectiontitle">ตารางอ่านรายวัน</h2>
+  <section class="panel">
+    <div class="dayhead">
+      <div><h2 id="dateTitle">เลือกวันที่</h2><small id="daySubtitle">เลือกดูงานของวันนั้น</small></div>
+      <div class="nav"><button id="prevBtn">‹ ก่อน</button><button id="nextBtn">ถัดไป ›</button></div>
+    </div>
+    <div id="tasks"></div>
+    <div class="notes">
+      <label for="noteBox">โน้ต / สิ่งที่ต้องกลับมาทวน</label>
+      <textarea id="noteBox" placeholder="เช่น บท 5 ยังทำ FOC ไม่คล่อง ต้องทำโจทย์เพิ่ม..."></textarea>
+      <div class="muted">โน้ตจะบันทึกอัตโนมัติเมื่อพิมพ์</div>
+    </div>
+  </section>
+  <h2 class="sectiontitle">เพิ่มงานของตัวเอง</h2>
+  <section class="panel">
+    <form id="addForm">
+      <label class="muted" for="customDate">วันที่</label><input id="customDate" type="date" required>
+      <div style="height:9px"></div>
+      <label class="muted" for="customTime">เวลา</label><input id="customTime" placeholder="เช่น 19:00–20:00">
+      <div style="height:9px"></div>
+      <label class="muted" for="customTask">งานที่ต้องอ่าน</label><input id="customTask" placeholder="เช่น ทำโจทย์ ANOVA 5 ข้อ" required>
+      <div style="height:12px"></div><button type="submit" style="width:100%;border:0;border-radius:12px;background:var(--purple);color:white;padding:12px;font-weight:700">+ เพิ่มงาน</button>
+    </form>
+  </section>
+  <p class="muted" style="margin:18px 3px">หมายเหตุ: ตารางนี้ตั้งต้นจากข้อมูลวันสอบที่คุณให้มา วันที่ผ่านไปแล้วสามารถเปิดดูและติ๊กย้อนหลังได้ หากวันสอบจริงมีการเปลี่ยน สามารถเพิ่มงานใหม่ตามวันที่ได้</p>
+</main>
+<script>
+const plan = {
+"2026-10-20":[["09:00–10:00","Math E — ทวนสูตรและขั้นตอนก่อนสอบ"],["08:00–11:00","สอบ Math E (ตามวันสอบที่แจ้ง)"],["15:30–17:00","พักหลังสอบ แล้วเริ่มทวน Stat เบา ๆ"],["19:00–20:30","Stat — ทบทวนการทดสอบสมมติฐาน"]],
+"2026-10-21":[["09:00–11:00","Stat — การทดสอบสมมติฐาน: ตั้ง H₀/H₁ เลือกสถิติ และสรุปผล"],["13:00–15:00","Stat — ANOVA: สูตร ตารางวิเคราะห์ และการแปลผล"],["15:30–17:00","ทำโจทย์รวม จับเวลา และตรวจคำตอบ"],["19:00–20:00","ทวนสูตรและข้อผิดพลาดที่พบบ่อย"]],
+"2026-10-22":[["09:00–10:00","Stat — ทวนสูตรและขั้นตอนที่จำเป็น"],["12:00–15:00","สอบ Stat"],["19:00–20:30","เริ่มทวน Spa จากสรุปที่ทำไว้"]],
+"2026-10-23":[["09:00–11:00","Spa — บท 3.1, 3.2 และบท 6"],["13:00–15:00","Spa — บท 5.2 และบท 5.1"],["15:30–17:00","Spa — กรณีศึกษางานเดี่ยว 4.1 และ 4.2"],["19:00–20:30","Mini case — เชื่อมข้อมูลกับแนวคิดในบทเรียน"]],
+"2026-10-24":[["09:00–11:00","Spa — ทวนบท 3.1, 3.2, 6 และ 5.2"],["13:00–15:00","Spa — กรณีศึกษา 4.1, 4.2 และ 5.1"],["15:30–17:00","Spa — บท 7 และหัวข้อที่ยังสับสน"],["19:00–20:00","ฝึกตอบคำถาม Mini case"]],
+"2026-10-25":[["08:00–11:00","สอบ Spa"],["15:30–17:00","Mic — ทวนสรุป"],["19:00–20:30","Mic — ทำคำถามทบทวน"]],
+"2026-10-26":[["09:00–11:00","Mic — เนื้อหาที่ยังไม่แม่น"],["13:00–15:00","Mic — ฝึกตอบคำถามหรือทำข้อสอบเก่า"],["15:30–17:00","สมาธิ — ทวนเนื้อหาและคำจำกัดความ"],["19:00–20:30","Mic — สรุปประเด็นสำคัญ"]],
+"2026-10-27":[["09:00–10:30","Mic — ทวนสรุปรอบสุดท้าย"],["12:00–15:00","สอบ Mic"],["19:00–20:30","สมาธิ — ทวนคำถามที่ต้องอธิบายเป็นขั้นตอน"]],
+"2026-10-28":[["09:00–10:30","สมาธิ — ทวนคำจำกัดความ แผนผัง และคำตอบสำคัญ"],["12:00–15:00","สอบสมาธิ"],["19:00–20:30","Mac — อ่านภาพรวมและสูตร"]],
+"2026-10-29":[["09:00–11:00","Mac — อ่านหัวข้อสำคัญและสูตร"],["13:00–15:00","Mac — ฝึกทำโจทย์และอธิบายกราฟ"],["15:30–17:00","Mac — ทบทวนหัวข้อที่ยังไม่เข้าใจ"],["19:00–20:00","อ่านสรุป Mac"]],
+"2026-10-30":[["08:00–11:00","สอบ Mac"],["15:30–17:00","รังสี — อ่านหัวข้อสำคัญ"],["19:00–20:30","รังสี — ทำสรุปคำศัพท์ แนวคิด หรือสูตร"]],
+"2026-10-31":[["09:00–11:00","รังสี — เนื้อหาส่วนที่ 1"],["13:00–15:00","รังสี — เนื้อหาส่วนที่ 2"],["15:30–17:00","รังสี — ฝึกตอบคำถามหรือทำข้อสอบเก่า"],["19:00–20:30","ทวนหัวข้อที่จำยาก"]],
+"2026-11-01":[["09:00–11:00","รังสี — ทวนเนื้อหาทั้งหมด"],["13:00–15:00","รังสี — ทำข้อสอบหรือแบบฝึกหัดรวม"],["15:30–17:00","ตรวจจุดผิดและทวนหัวข้อที่ไม่แม่น"],["19:00–20:00","อ่านสรุปครั้งสุดท้ายและเตรียมอุปกรณ์สอบ"]],
+"2026-11-02":[["09:00–10:00","รังสี — ทวนสรุปเบา ๆ"],["12:00–15:00","สอบรังสี"]]
+};
+const exams=[
+["2026-10-20","Math E","08:00–11:00"],["2026-10-22","Stat","12:00–15:00"],["2026-10-25","Spa","08:00–11:00"],["2026-10-27","Mic","12:00–15:00"],["2026-10-28","สมาธิ","12:00–15:00"],["2026-10-30","Mac","08:00–11:00"],["2026-11-02","รังสี","12:00–15:00"]
+];
+const labels=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+let selected="2026-10-20";
+let custom=JSON.parse(localStorage.getItem("fsp_custom")||"{}");
+let checked=JSON.parse(localStorage.getItem("fsp_checked")||"{}");
+let notes=JSON.parse(localStorage.getItem("fsp_notes")||"{}");
+const $=id=>document.getElementById(id);
+function dateObj(s){return new Date(s+"T12:00:00")}
+function fmt(s){let d=dateObj(s);return `${labels[d.getDay()]} ${d.getDate()} ${["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][d.getMonth()]} ${d.getFullYear()+543}`}
+function allTasks(){let out={};Object.keys(plan).forEach(d=>out[d]=plan[d].map((x,i)=>({id:`${d}-p${i}`,time:x[0],desc:x[1]})));Object.keys(custom).forEach(d=>{out[d]=out[d]||[];custom[d].forEach((x,i)=>out[d].push({...x,id:`${d}-c${i}`}))});return out}
+function renderExams(){$("exams").innerHTML=exams.map(e=>`<div class="exam"><div class="dot"></div><div><strong>${e[1]}</strong><small>${fmt(e[0])} · ${e[2]}</small></div></div>`).join("")}
+function render(){let d=dateObj(selected);$("dateTitle").textContent=fmt(selected);$("daySubtitle").textContent=`${(allTasks()[selected]||[]).length} งานในวันนี้`;let arr=allTasks()[selected]||[];$("tasks").innerHTML=arr.length?arr.map(t=>`<label class="task ${checked[t.id]?"done":""}"><input type="checkbox" data-id="${t.id}" ${checked[t.id]?"checked":""}><span class="time">${t.time||"เวลาไม่ระบุ"}</span><span class="desc">${t.desc}</span></label>`).join(""):'<div class="empty">วันนี้ยังไม่มีงานอ่านหนังสือ<br>เพิ่มงานของตัวเองได้ด้านล่าง ✨</div>';
+document.querySelectorAll("#tasks input").forEach(el=>el.addEventListener("change",e=>{checked[e.target.dataset.id]=e.target.checked;localStorage.setItem("fsp_checked",JSON.stringify(checked));render()}));
+$("noteBox").value=notes[selected]||"";let tasks=Object.values(allTasks()).flat();let done=tasks.filter(t=>checked[t.id]).length;$("doneCount").textContent=done;$("totalCount").textContent=tasks.length;$("percent").textContent=(tasks.length?Math.round(done/tasks.length*100):0)+"%";$("progressFill").style.width=(tasks.length?done/tasks.length*100:0)+"%";$("customDate").value=selected}
+$("noteBox").addEventListener("input",e=>{notes[selected]=e.target.value;localStorage.setItem("fsp_notes",JSON.stringify(notes))});
+$("prevBtn").onclick=()=>{let d=dateObj(selected);d.setDate(d.getDate()-1);selected=d.toISOString().slice(0,10);render()};
+$("nextBtn").onclick=()=>{let d=dateObj(selected);d.setDate(d.getDate()+1);selected=d.toISOString().slice(0,10);render()};
+$("todayBtn").onclick=()=>{selected=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Bangkok"});render()};
+$("resetBtn").onclick=()=>{if(confirm("ลบเครื่องหมายว่างานเสร็จแล้วทั้งหมดหรือไม่?")){checked={};localStorage.setItem("fsp_checked","{}");render()}};
+$("addForm").addEventListener("submit",e=>{e.preventDefault();let d=$("customDate").value;custom[d]=custom[d]||[];custom[d].push({time:$("customTime").value,desc:$("customTask").value});localStorage.setItem("fsp_custom",JSON.stringify(custom));selected=d;$("customTime").value="";$("customTask").value="";render()});
+$("exportBtn").onclick=()=>{let lines=["Final Study Planner","",...Object.keys(allTasks()).sort().map(d=>`${fmt(d)}\n${(allTasks()[d]||[]).map(t=>`${checked[t.id]?"[✓]":"[ ]"} ${t.time} ${t.desc}`).join("\n")}\nโน้ต: ${notes[d]||"-"}\n`)].join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines],{type:"text/plain;charset=utf-8"}));a.download="final-study-planner.txt";a.click();URL.revokeObjectURL(a.href)};
+renderExams();render();
+</script>
+</body>
+</html>
